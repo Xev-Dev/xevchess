@@ -1,0 +1,39 @@
+{
+  "name": "front",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
+  },
+  "dependencies": {
+    "chess.js": "^1.0.0-beta.4",
+    "install": "^0.13.0",
+    "npm": "^9.6.2",
+    "oh-vue-icons": "^1.0.0-rc3",
+    "socket.io-client": "^4.6.1",
+    "vue": "^3.2.47",
+    "vue-router": "^4.1.6"
+  },
+  "devDependencies": {
+    "@rushstack/eslint-patch": "^1.2.0",
+    "@vitejs/plugin-vue": "^4.1.0",
+    "@vue/eslint-config-prettier": "^7.1.0",
+    "eslint": "^8.36.0",
+    "eslint-plugin-vue": "^9.10.0",
+    "prettier": "^2.8.6",
+    "vite": "^4.2.0",
+    "vue-eslint-parser": "^9.1.0"
+  },
+  "eslintConfig": {
+    "parser": "vue-eslint-parser",
+    "extends": [
+      "plugin:vue/vue3-essential",
+      "eslint:recommended",
+      "@vue/eslint-config-prettier"
+    ]
+  }
+}
