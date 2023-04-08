@@ -1,2 +1,2 @@
 # xevchess
-Un ajedrez multijugador en tiempo real con Vue3 y Socket.io
+Multiplayer chess game with Vue 3, Chess.js and Socket.io.
