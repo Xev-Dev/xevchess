@@ -12,7 +12,7 @@ import {
   whiteTimer,
 } from "./reactives";
 const serverURL = parseInt(import.meta.env.VITE_PROD)
-  ? undefined
+  ? "http://192.168.1.150:49160"
   : "http://localhost:3000";
 
 export const socket = io(serverURL);
