@@ -11,8 +11,8 @@ import {
   roomNotValid,
   whiteTimer,
 } from "./reactives";
-const serverURL = "https://xevchess.duckdns.org";
-export const socket = io(serverURL);
+
+export const socket = io("https://xevchess.duckdns.org");
 
 socket.on("connected", () => {
   connected.value = true;
