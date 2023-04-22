@@ -11,10 +11,7 @@ import {
   roomNotValid,
   whiteTimer,
 } from "./reactives";
-const serverURL = parseInt(import.meta.env.VITE_PROD)
-  ? "http://192.168.1.150:49160"
-  : "http://localhost:3000";
-
+const serverURL = "https://xevchess.duckdns.org";
 export const socket = io(serverURL);
 
 socket.on("connected", () => {

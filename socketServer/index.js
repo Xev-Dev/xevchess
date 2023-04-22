@@ -7,7 +7,7 @@ const history = require('connect-history-api-fallback');
 let cors = {
     cors:
     {
-    origin: "http://192.168.1.150:49160",
+    origin: "https://xevchess.duckdns.org",
     credentials: true,
     }
 }
