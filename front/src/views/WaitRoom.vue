@@ -5,9 +5,7 @@ import { watch } from "vue";
 import CustomLoading from "../components/common/CustomLoading.vue";
 import { useRouter } from "vue-router";
 const router = useRouter();
-const url = parseInt(import.meta.env.VITE_PROD)
-  ? import.meta.env.VITE_PROD_URL
-  : import.meta.env.VITE_DEV_URL;
+const url = "https://xevchess.duckdns.org/";
 watch(connected, (newValue) => {
   if (newValue) {
     socket.emit("createRoom", `room-${socket.id}`);
