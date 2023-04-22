@@ -4,9 +4,13 @@ const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const history = require('connect-history-api-fallback');
-let cors = parseInt(process.env.PROD)?undefined:{cors: {
-    origin: "http://localhost:5173"
-}}
+let cors = {
+    cors:
+    {
+    origin: "http://192.168.1.150:49160",
+    credentials: true,
+    }
+}
 const io = new Server(server,cors);
 let rooms = [];
 io.on("connection", (socket) => {
