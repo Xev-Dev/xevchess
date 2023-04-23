@@ -46,7 +46,7 @@ function handleSquareAction() {
 </script>
 
 <template>
-  <div :class="squareColor" @click="handleSquareAction()">
+  <div @click="handleSquareAction()" :class="squareColor">
     <img
       alt="Chess piece"
       v-if="piece"

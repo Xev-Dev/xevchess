@@ -7,11 +7,14 @@ const history = require('connect-history-api-fallback');
 let cors = {
     cors:
     {
-    origin: "https://xevchess.duckdns.org",
+    origin: process.env.ENV === "prod" ? 
+    "https://xevchess.duckdns.org":
+    "http://localhost:5173",
     credentials: true,
     }
 }
 const io = new Server(server,cors);
+
 let rooms = [];
 io.on("connection", (socket) => {
     socket.emit('connected');
@@ -22,7 +25,9 @@ io.on("connection", (socket) => {
             whiteTimer: 300,
             whiteInterval: null,
             blackTimer: 300,
-            blackInterval: null
+            blackInterval: null,
+            reconnectionTimer: 30,
+            reconnectionInterval: null,
         }
         rooms.push(roomItem);
     });
@@ -83,15 +88,42 @@ io.on("connection", (socket) => {
         let room = rooms[index];
         clearInterval(room.whiteInterval);
         clearInterval(room.blackInterval);
+        clearInterval(room.reconnectionInterval);
+        room.reconnectionTimer = 30;
         room.whiteTimer = 300;
         room.blackTimer = 300;
     })
     socket.on("rematch",(roomId)=>{
         socket.to(roomId).emit('rematch');
     })
-    socket.on("disconnect", () => {
-        console.log('user disconnected');
+    socket.on("startReconnectionTimer",(roomId)=>{
+        let index = rooms.findIndex((element) => element.roomId === roomId);
+        let room = rooms[index];
+        room.reconnectionInterval = setInterval(()=>{
+            room.reconnectionTimer --;
+            socket.emit('updateReconnectionTimer',room.reconnectionTimer);
+            if(room.reconnectionTimer === 0){
+                socket.emit('winByDisconnection');
+            }
+        },1000)
+    })
+    socket.on("stopReconnectionTimer",(roomId)=>{
+        let index = rooms.findIndex((element) => element.roomId === roomId);
+        let room = rooms[index];
+        clearInterval(room.reconnectionInterval);
+        room.reconnectionTimer = 30;
+    })
+    socket.on("reconnectOpponent",(item)=>{
+        socket.to(item.room).emit("reconnectionInfo",item);
+    })
+    socket.on('disconnecting', function(){
+        let room = "";
+        socket.rooms.forEach((element)=>{
+            room = element;
+        });
+        socket.to(room).emit("disconnected");
     });
+    
 })
 app.use(history());
 app.use(express.static(__dirname + '/dist'));

@@ -6,6 +6,7 @@ import {
   room,
   rematch,
   myTurn,
+  opponentConnection,
 } from "../reactives";
 import { socket } from "../socket";
 import { useRouter } from "vue-router";
@@ -28,7 +29,6 @@ function handleRematch() {
   rematch.me = true;
 }
 watch(rematch, (newValue) => {
-  console.log("im here");
   if (newValue.me && newValue.opponent) {
     rematchReset();
     resetGame();
@@ -53,7 +53,9 @@ watch(rematch, (newValue) => {
     <div class="modal">
       <h1 class="modalTitle">{{ status }}</h1>
       <div class="buttonWrapper">
-        <button @click="handleRematch">Rematch</button>
+        <button v-if="opponentConnection" @click="handleRematch">
+          Rematch
+        </button>
         <button @click="handleReset">Get a new link</button>
       </div>
     </div>

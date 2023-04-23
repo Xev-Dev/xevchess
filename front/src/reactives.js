@@ -1,6 +1,7 @@
 import { reactive, ref } from "vue";
 export const room = ref("");
 export const connected = ref(false);
+export const opponentConnection = ref(false);
 export const gameStarted = ref(false);
 export const board = ref([]);
 export const playerColor = ref("");
@@ -11,6 +12,7 @@ export const gameOver = ref(undefined);
 export const whiteTimer = ref(300);
 export const blackTimer = ref(300);
 export const roomNotValid = ref(false);
+export const reconnectionTimer = ref(30);
 export const rematch = reactive({ me: undefined, opponent: undefined });
 export const coronation = reactive({
   x: undefined,
@@ -34,6 +36,7 @@ export const resetReactives = () => {
   enemyPiecesCaptured.value = [];
   whiteTimer.value = 300;
   blackTimer.value = 300;
+  opponentConnection.value = false;
 };
 export const rematchReset = () => {
   board.value = [];
@@ -46,4 +49,5 @@ export const rematchReset = () => {
   enemyPiecesCaptured.value = [];
   whiteTimer.value = 300;
   blackTimer.value = 300;
+  opponentConnection.value = false;
 };

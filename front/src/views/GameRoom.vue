@@ -1,5 +1,7 @@
 <script setup>
 import {
+  reconnectionTimer,
+  opponentConnection,
   connected,
   roomNotValid,
   gameStarted,
@@ -43,6 +45,9 @@ watch(roomNotValid, (newValue) => {
         :status="gameOver"
       ></GameOverModal>
       <CoronationModal v-if="coronation.x !== undefined"></CoronationModal>
+      <p class="reconnectionMessage" v-if="!opponentConnection">
+        Opponent's disconnected! Waiting reconnection: {{ reconnectionTimer }}
+      </p>
       <div class="gameInfoWrapper topRadius reverse">
         <ChessTimer
           :time="playerColor === 'w' ? blackTimer : whiteTimer"
@@ -72,7 +77,7 @@ watch(roomNotValid, (newValue) => {
   justify-content: space-between;
   height: 30px;
   align-items: center;
-  background-color: rgb(162, 162, 162);
+  background-color: rgb(174, 171, 171);
 }
 .topRadius {
   border-top-right-radius: 5px;
@@ -84,5 +89,11 @@ watch(roomNotValid, (newValue) => {
 }
 .reverse {
   flex-direction: row-reverse;
+}
+.reconnectionMessage {
+  font-size: 15px;
+  position: absolute;
+  top: 0.5rem;
+  left: 1rem;
 }
 </style>

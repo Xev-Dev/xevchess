@@ -33,8 +33,17 @@ export function updateBoard() {
   }
 }
 
+export function updateGameStatus(fen) {
+  chess.load(fen);
+  updateBoard();
+}
+
 export function getSquareColor(square) {
   return chess.squareColor(square);
+}
+
+export function getFen() {
+  return chess.fen();
 }
 
 export function selectPiece(cord, square) {
@@ -124,7 +133,11 @@ export function handleMove(cord, square) {
 }
 
 export function handleCoronation(letter) {
-  coronation.move = coronation.move.slice(0, -1);
+  if (coronation.move.includes("+")) {
+    coronation.move = coronation.move.slice(0, -2);
+  } else {
+    coronation.move = coronation.move.slice(0, -1);
+  }
   coronation.move += letter.toUpperCase();
   doMovement(coronation.move, { x: coronation.cord.x, y: coronation.cord.y });
   unsetCoronation();
@@ -184,18 +197,18 @@ function unsetCoronation() {
 }
 
 socket.on("enemyMove", (move, position) => {
-  chess.move(move);
-  enemyMoves.push(position.init);
-  enemyMoves.push(position.end);
-  updateBoard();
-  setEnemyMoves();
   let square = board.value[position.end.x][position.end.y];
-  if (square.color && square.color === playerColor.value) {
+  if (square.color === playerColor.value) {
     enemyPiecesCaptured.value.push({
       type: square.type,
       color: square.color,
     });
   }
+  chess.move(move);
+  enemyMoves.push(position.init);
+  enemyMoves.push(position.end);
+  updateBoard();
+  setEnemyMoves();
   if (chess.isGameOver()) {
     socket.emit("stopTimers", room.value);
     if (chess.isDraw()) {
