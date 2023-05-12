@@ -5,9 +5,11 @@ import {
   selectPiece,
   unselectPiece,
   handleMove,
+  notifySound,
 } from "../modules/game";
 import { playerColor, board } from "../reactives";
 import ChessSquare from "./ChessSquare.vue";
+
 function handleAction(action, cord, square) {
   switch (action) {
     case "select":
@@ -23,7 +25,9 @@ function handleAction(action, cord, square) {
       break;
   }
 }
+
 updateBoard();
+notifySound();
 </script>
 
 <template>

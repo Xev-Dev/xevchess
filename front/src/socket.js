@@ -13,22 +13,23 @@ import {
   roomNotValid,
   whiteTimer,
 } from "./reactives";
+let getFen;
+let updateGameStatus;
 
 const environment = import.meta.env.VITE_ENV;
+
 const url =
   environment === "dev"
     ? "http://localhost:3000/"
     : "https://xevchess.duckdns.org/";
 
 export const socket = io(url);
-let fenFunction;
-let updateFunction;
 
 socket.on("connected", () => {
   connected.value = true;
-  import("./modules/game").then((obj) => {
-    fenFunction = obj.getFen;
-    updateFunction = obj.updateGameStatus;
+  import("./modules/game").then((gameModule) => {
+    getFen = gameModule.getFen;
+    updateGameStatus = gameModule.updateGameStatus;
   });
 });
 
@@ -37,7 +38,7 @@ socket.on("joined", () => {
     socket.emit("stopReconnectionTimer", room.value);
     opponentConnection.value = true;
     let reconnectionItem = {
-      fen: fenFunction(),
+      fen: getFen(),
       room: room.value,
       turn: !myTurn.value,
       color: playerColor.value,
@@ -64,7 +65,7 @@ socket.on("reconnectionInfo", (item) => {
   myTurn.value = item.turn;
   gameStarted.value = true;
   opponentConnection.value = true;
-  updateFunction(item.fen);
+  updateGameStatus(item.fen);
 });
 
 socket.on("gameIsReady", (gameRoom, color) => {
@@ -117,6 +118,8 @@ socket.on("winByDisconnection", () => {
 });
 
 socket.on("disconnected", () => {
-  opponentConnection.value = false;
-  socket.emit("startReconnectionTimer", room.value);
+  if (gameOver.value === undefined) {
+    opponentConnection.value = false;
+    socket.emit("startReconnectionTimer", room.value);
+  }
 });

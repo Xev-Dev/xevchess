@@ -12,6 +12,7 @@ import {
 import { socket } from "../socket";
 
 const chess = new Chess();
+
 const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
 let selectedPiece = { x: null, y: null };
@@ -21,6 +22,7 @@ let enemyMoves = [];
 export function updateBoard() {
   board.value = [];
   board.value = [...chess.board()];
+  console.log(board.value);
   for (let i = 0; i < board.value.length; i++) {
     for (let j = 0; j < board.value.length; j++) {
       if (board.value[i][j] === null) {
@@ -31,6 +33,11 @@ export function updateBoard() {
       board.value[i][j].state = "unselected";
     }
   }
+}
+
+export function notifySound() {
+  let audio = new Audio("./SOUND_PIECES/notify.mp3");
+  audio.play();
 }
 
 export function updateGameStatus(fen) {
@@ -50,47 +57,18 @@ export function selectPiece(cord, square) {
   if (selectedPiece.x !== null) {
     unselectPiece(selectedPiece);
   }
+
   board.value[cord.x][cord.y].state = "selected";
   selectedPiece = { ...cord };
+
   let legalMoves = [...chess.moves({ square: square })];
+
   legalMoves.forEach((move) => {
-    if (move === "O-O") {
-      let square = undefined;
-      let row = undefined;
-      if (playerColor.value === "w") {
-        board.value[7][7].state = "legalMove";
-        square = board.value[7][7].square;
-        row = 7;
-      } else {
-        board.value[0][7].state = "legalMove";
-        square = board.value[0][7].square;
-        row = 0;
-      }
-      legalMovesHistory.push({
-        move: move,
-        square: square,
-        row: row,
-      });
-    } else if (move === "O-O-O") {
-      let square = undefined;
-      let row = undefined;
-      if (playerColor.value === "w") {
-        board.value[7][0].state = "legalMove";
-        square = board.value[7][0].square;
-        row = 7;
-      } else {
-        board.value[0][0].state = "legalMove";
-        square = board.value[0][0].square;
-        row = 0;
-      }
-      legalMovesHistory.push({
-        move: move,
-        square: square,
-        row: row,
-      });
+    if (move === "O-O" || move === "O-O-O") {
+      handleCastling(move);
     } else {
-      let letterArray = move.match(/[a-h]/g);
-      let letter = letterArray[letterArray.length - 1];
+      let letters = move.match(/[a-h]/g);
+      let letter = letters.pop();
       let row = parseInt(move.match(/[1-8]/g)[0]);
       let square = board.value[8 - row].find(
         (element) => element.square === letter + row
@@ -118,7 +96,7 @@ export function handleMove(cord, square) {
     (element) => element.square === square
   );
   let position = board.value[cord.x][cord.y];
-  if (position.type !== undefined && position.color !== playerColor.value) {
+  if (position.type && position.color !== playerColor.value) {
     piecesCaptured.value.push({ type: position.type, color: position.color });
   }
   let move = legalMove.move;
@@ -140,10 +118,46 @@ export function handleCoronation(letter) {
   }
   coronation.move += letter.toUpperCase();
   doMovement(coronation.move, { x: coronation.cord.x, y: coronation.cord.y });
-  unsetCoronation();
+}
+
+function handleCastling(move) {
+  let square;
+  let row;
+  if (move === "O-O") {
+    if (playerColor.value === "w") {
+      board.value[7][7].state = "legalMove";
+      square = board.value[7][7].square;
+      row = 7;
+    } else {
+      board.value[0][7].state = "legalMove";
+      square = board.value[0][7].square;
+      row = 0;
+    }
+    legalMovesHistory.push({
+      move: move,
+      square: square,
+      row: row,
+    });
+  } else if (move === "O-O-O") {
+    if (playerColor.value === "w") {
+      board.value[7][0].state = "legalMove";
+      square = board.value[7][0].square;
+      row = 7;
+    } else {
+      board.value[0][0].state = "legalMove";
+      square = board.value[0][0].square;
+      row = 0;
+    }
+    legalMovesHistory.push({
+      move: move,
+      square: square,
+      row: row,
+    });
+  }
 }
 
 function doMovement(move, cord) {
+  playSound(move, cord);
   chess.move(move);
   updateBoard();
   socket.emit("move", room.value, move, {
@@ -154,6 +168,22 @@ function doMovement(move, cord) {
   unsetEnemyMoves();
   unsetCoronation();
   myTurn.value = false;
+}
+
+function playSound(move, cord) {
+  let audio;
+  if (move.includes("=")) {
+    audio = new Audio("./SOUND_PIECES/promote.mp3");
+  } else if (move.includes("+")) {
+    audio = new Audio("./SOUND_PIECES/move-check.mp3");
+  } else if (move === "O-O" || move === "O-O-O") {
+    audio = new Audio("./SOUND_PIECES/castle.mp3");
+  } else if (board.value[cord.x][cord.y].type) {
+    audio = new Audio("./SOUND_PIECES/capture.mp3");
+  } else {
+    audio = new Audio("./SOUND_PIECES/move-self.mp3");
+  }
+  audio.play();
 }
 
 export function resetGame() {
@@ -204,27 +234,28 @@ socket.on("enemyMove", (move, position) => {
       color: square.color,
     });
   }
+  playSound(move, position.end);
   chess.move(move);
   enemyMoves.push(position.init);
   enemyMoves.push(position.end);
   updateBoard();
   setEnemyMoves();
+
   if (chess.isGameOver()) {
     socket.emit("stopTimers", room.value);
     if (chess.isDraw()) {
-      gameOver.value = "Draw by insufficient material or repetition";
-      socket.emit(
-        "gameOver",
-        room.value,
-        "Draw by insufficient material or repetition"
-      );
+      let message = "Draw by insufficient material or repetition";
+      gameOver.value = message;
+      socket.emit("gameOver", room.value, message);
     }
     if (chess.isStalemate()) {
-      gameOver.value = "Draw by stalemate";
+      let message = "Draw by stalemate";
+      gameOver.value = message;
       socket.emit("gameOver", room.value, "Stalemate!");
     }
     if (chess.isCheckmate()) {
-      gameOver.value = "You've been checkmated";
+      let message = "You've been checkmated";
+      gameOver.value = message;
       socket.emit("gameOver", room.value, "Checkmate!");
     }
   } else {

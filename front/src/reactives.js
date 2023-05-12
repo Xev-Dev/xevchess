@@ -20,23 +20,14 @@ export const coronation = reactive({
   move: undefined,
   cord: undefined,
 });
+
 export const resetReactives = () => {
   room.value = "";
   connected.value = false;
   gameStarted.value = false;
-  board.value = [];
   playerColor.value = "";
-  myTurn.value = false;
-  coronation.x = undefined;
-  coronation.y = undefined;
-  coronation.move = undefined;
-  coronation.cord = undefined;
   gameOver.value = undefined;
-  piecesCaptured.value = [];
-  enemyPiecesCaptured.value = [];
-  whiteTimer.value = 300;
-  blackTimer.value = 300;
-  opponentConnection.value = false;
+  rematchReset();
 };
 export const rematchReset = () => {
   board.value = [];
@@ -49,5 +40,5 @@ export const rematchReset = () => {
   enemyPiecesCaptured.value = [];
   whiteTimer.value = 300;
   blackTimer.value = 300;
-  opponentConnection.value = false;
+  opponentConnection.value = true;
 };

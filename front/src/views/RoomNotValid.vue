@@ -7,12 +7,14 @@ function goToWaitRoom() {
   router.push("/");
 }
 </script>
+
 <template>
   <div class="notValidWrapper">
     <h1 class="titleNotValid">Im sorry, this link is not available anymore.</h1>
-    <button @click="goToWaitRoom()">Get a link</button>
+    <button @click="goToWaitRoom()">Get a new link</button>
   </div>
 </template>
+
 <style>
 .notValidWrapper {
   display: flex;
@@ -21,5 +23,8 @@ function goToWaitRoom() {
   height: 100%;
   flex-direction: column;
   gap: 20px;
+}
+.notValidWrapper button {
+  padding: 1rem;
 }
 </style>

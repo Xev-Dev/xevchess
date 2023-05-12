@@ -1,5 +1,5 @@
 <script setup>
-import { resetGame, updateBoard } from "../modules/game";
+import { resetGame, updateBoard, notifySound } from "../modules/game";
 import {
   rematchReset,
   resetReactives,
@@ -46,6 +46,7 @@ watch(rematch, (newValue) => {
     updateBoard();
   }
 });
+notifySound();
 </script>
 
 <template>

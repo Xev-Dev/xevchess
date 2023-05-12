@@ -15,16 +15,16 @@ const emit = defineEmits(["action"]);
 
 const squareColor = computed(() => {
   if (props.state === "selected") {
-    return "selectedSquare square";
+    return "selectedSquare";
   } else if (props.state === "legalMove") {
-    return "legalMoveSquare square";
+    return "legalMoveSquare";
   } else if (props.state === "enemyMove") {
-    return "enemyMoveSquare square";
+    return "enemyMoveSquare";
   } else {
     if (props.color === "light") {
-      return "whiteSquare square";
+      return "whiteSquare";
     } else {
-      return "blackSquare square";
+      return "blackSquare";
     }
   }
 });
@@ -46,7 +46,7 @@ function handleSquareAction() {
 </script>
 
 <template>
-  <div @click="handleSquareAction()" :class="squareColor">
+  <div @click="handleSquareAction()" :class="`${squareColor} square`">
     <img
       alt="Chess piece"
       v-if="piece"

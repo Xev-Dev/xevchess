@@ -1,6 +1,5 @@
 <script setup>
 import {
-  reconnectionTimer,
   opponentConnection,
   connected,
   roomNotValid,
@@ -22,6 +21,7 @@ import GameOverModal from "../components/GameOverModal.vue";
 import CoronationModal from "../components/CoronationModal.vue";
 import ChessTimer from "../components/common/ChessTimer.vue";
 import CaptureList from "../components/common/CaptureList.vue";
+import ReconnectionMessage from "../components/ReconnectionMessage.vue";
 const route = useRoute();
 const router = useRouter();
 watch(connected, (newValue) => {
@@ -44,17 +44,20 @@ watch(roomNotValid, (newValue) => {
         v-if="gameOver !== undefined"
         :status="gameOver"
       ></GameOverModal>
+
       <CoronationModal v-if="coronation.x !== undefined"></CoronationModal>
-      <p class="reconnectionMessage" v-if="!opponentConnection">
-        Opponent's disconnected! Waiting reconnection: {{ reconnectionTimer }}
-      </p>
+
+      <ReconnectionMessage v-if="!opponentConnection"></ReconnectionMessage>
+
       <div class="gameInfoWrapper topRadius reverse">
         <ChessTimer
           :time="playerColor === 'w' ? blackTimer : whiteTimer"
         ></ChessTimer>
         <CaptureList :piecesCaptured="enemyPiecesCaptured"></CaptureList>
       </div>
+
       <ChessBoard></ChessBoard>
+
       <div class="gameInfoWrapper bottomRadius">
         <ChessTimer
           :time="playerColor === 'w' ? whiteTimer : blackTimer"
@@ -89,11 +92,5 @@ watch(roomNotValid, (newValue) => {
 }
 .reverse {
   flex-direction: row-reverse;
-}
-.reconnectionMessage {
-  font-size: 15px;
-  position: absolute;
-  top: 0.5rem;
-  left: 1rem;
 }
 </style>
